@@ -65,7 +65,7 @@ if __name__ == "__main__":
     # if not no_gpu:
     #     gpu_str = "--gpus all "
 
-    gpu_str = "--gpus all "
+    gpu_str = "--gpus device=1 "
 
     try:
         docker_str = (
@@ -80,28 +80,28 @@ if __name__ == "__main__":
         print(ret)
         exit(1)
 
-    print("\nPredicting sample-level anomalies.")
+    #print("\nPredicting sample-level anomalies.")
 
-    try:
-        docker_str = (
-                #f"sudo docker run {gpu_str}-v {toy_input_dir}:/mnt/data "
-                #f"-v {output_dir}:/mnt/pred mood_example sh /workspace/run_sample_brain.sh /mnt/data /mnt/pred"
-            f"docker run {gpu_str}-v {toy_input_dir}:/mnt/data "
-            f"-v {output_dir}:/mnt/pred mood_example sh /workspace/run_sample_brain.sh /mnt/data /mnt/pred"
-        )
-        ret = subprocess.run(docker_str.split(" "), check=True,)
-    except Exception:
-        print("Running Docker sample-script failed:")
-        print(ret)
-        exit(1)
+    #try:
+    #    docker_str = (
+    #            #f"sudo docker run {gpu_str}-v {toy_input_dir}:/mnt/data "
+    #            #f"-v {output_dir}:/mnt/pred mood_example sh /workspace/run_sample_brain.sh /mnt/data /mnt/pred"
+    #        f"docker run {gpu_str}-v {toy_input_dir}:/mnt/data "
+    #        f"-v {output_dir}:/mnt/pred mood_example sh /workspace/run_sample_brain.sh /mnt/data /mnt/pred"
+    #    )
+    #    ret = subprocess.run(docker_str.split(" "), check=True,)
+    #except Exception:
+    #    print("Running Docker sample-script failed:")
+    #    print(ret)
+    #    exit(1)
 
     print("\nEvaluating predictions...")
 
     res_pixel = evalresults.eval_dir(output_dir, toy_label_pixel_dir, mode="pixel",)
     print("Pixel-level score:", res_pixel)
 
-    res_sample = evalresults.eval_dir(output_dir, toy_label_sample_dir, mode="sample",)
-    print("Sample-level scores:", res_sample)
+    #res_sample = evalresults.eval_dir(output_dir, toy_label_sample_dir, mode="sample",)
+    #print("Sample-level scores:", res_sample)
 
     tmp_dir.cleanup()
 

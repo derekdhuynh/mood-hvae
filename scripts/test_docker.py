@@ -89,19 +89,6 @@ if __name__ == "__main__":
     if no_gpu:
         gpu_str = "--gpus device=1 "
 
-    print("Predicting abdominal data...")
-
-    try:
-        docker_str = (
-            f"docker run {gpu_str}-v {abdom_toy_data_dir}:/mnt/data "
-            f"-v {output_abdom_dir}:/mnt/pred --read-only {docker_name} sh /workspace/run_{task}_abdom.sh /mnt/data /mnt/pred"
-        )
-        ret = subprocess.run(docker_str.split(" "), check=True,)
-    except Exception:
-        print(f"Running Docker abdom-{task}-script failed:")
-        print(ret)
-        exit(1)
-
     print("\nPredicting brain data...")
 
     ret = ""
@@ -116,18 +103,18 @@ if __name__ == "__main__":
         print(ret)
         exit(1)
 
-    #print("Predicting abdominal data...")
+    print("Predicting abdominal data...")
 
-    #try:
-    #    docker_str = (
-    #        f"docker run {gpu_str}-v {abdom_toy_data_dir}:/mnt/data "
-    #        f"-v {output_abdom_dir}:/mnt/pred --read-only {docker_name} sh /workspace/run_{task}_abdom.sh /mnt/data /mnt/pred"
-    #    )
-    #    ret = subprocess.run(docker_str.split(" "), check=True,)
-    #except Exception:
-    #    print(f"Running Docker abdom-{task}-script failed:")
-    #    print(ret)
-    #    exit(1)
+    try:
+        docker_str = (
+            f"docker run {gpu_str}-v {abdom_toy_data_dir}:/mnt/data "
+            f"-v {output_abdom_dir}:/mnt/pred --read-only {docker_name} sh /workspace/run_{task}_abdom.sh /mnt/data /mnt/pred"
+        )
+        ret = subprocess.run(docker_str.split(" "), check=True,)
+    except Exception:
+        print(f"Running Docker abdom-{task}-script failed:")
+        print(ret)
+        exit(1)
 
     print("\nEvaluating predictions...")
 

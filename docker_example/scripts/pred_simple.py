@@ -1,3 +1,8 @@
+"""
+Predict sample and pixel level scores for anomalies
+
+TODO: Make sure there's no redundancy in compute_llr_scores function
+"""
 import os
 from collections import defaultdict
 
@@ -42,7 +47,6 @@ def make_strided_patches(img, patch_size=(28, 28), stride=(4, 4), bg_tol=0.1, to
     """
     Given a 2D slice, create a dataset of by striding over the image and taking
     patches of size patch_size
-
     TODO: Add edge cases for strides that need padding
     """
     # All background voxels
@@ -196,17 +200,24 @@ def predict_folder_pixel_abs(input_folder, target_folder):
         stride = (11, 11)
         iw_samples_elbo = 1
         tol = 0.02
-        checkpoint = oodd.models.Checkpoint(path='/workspace/models/mood_abdom_10-mix_150-epochs_no-nats_no-cooldown')
-        mn = 6100
+        #checkpoint = oodd.models.Checkpoint(path='/workspace/models/abdom/mood_abdom_axial_10-mix_500-epochs_no-nats_no-cooldown')
+        checkpoint = oodd.models.Checkpoint(path='/workspace/models/abdom/mood_abdom_10-mix_150-epochs_no-nats_no-cooldown')
+        mn = 6100 
         mx = 6250
+
+        #mn = 6250
+        #mx = 7900
         
     else:
         stride = (4, 4)
         iw_samples_elbo = 5
         tol = 0.
-        checkpoint = oodd.models.Checkpoint(path='/workspace/models/mood_10mix_1000epochs_no-cool_no-nats')
+        checkpoint = oodd.models.Checkpoint(path='/workspace/models/brain/mood_brain_axial_10-mix_1000-epochs_no-cool_no-nats')
         mn = 7750
         mx = 7900
+
+        #mn = 6250
+        #mx = 7900
 
     # Loading model
     checkpoint.load_model()
@@ -215,6 +226,9 @@ def predict_folder_pixel_abs(input_folder, target_folder):
     model.to(device)
 
     for f in os.listdir(input_folder):
+        source_file = os.path.join(input_folder, f)
+        target_file = os.path.join(target_folder, f)
+
         nimg = nib.load(source_file)
         nimg_array = nimg.get_fdata()
 
