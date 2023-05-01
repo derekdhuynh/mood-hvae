@@ -3,6 +3,7 @@ Predict sample and pixel level scores for anomalies
 """
 import os
 from collections import defaultdict
+from typing import Optional
 
 import nibabel as nib
 import numpy as np
@@ -45,8 +46,6 @@ def make_strided_patches(img, patch_size=(28, 28), stride=(4, 4), bg_tol=0.05, t
     """
     Given a 2D slice, create a dataset by striding over the image and taking
     patches of size patch_size
-
-    TODO: Add edge cases for strides that need padding
     """
     # All background voxels
     if (img <= tol).all() == True:
@@ -94,7 +93,41 @@ def make_strided_patches(img, patch_size=(28, 28), stride=(4, 4), bg_tol=0.05, t
     coords = torch.tensor(coords)
     return patches, coords
 
-def compute_llr_scores(img, model, iw_samples_elbo=5, iw_samples_Lk=1, n_latents_skip=2, batch_size=256, stride=(4, 4), tol=0., plane='axial'):
+def compute_llr_scores(
+        img: torch.Tensor, model: torch.Model, 
+        iw_samples_elbo: Optional[int] = 5, 
+        iw_samples_Lk: Optional[int] = 1, 
+        n_latents_skip: Optional[int] = 2,
+        batch_size: Optional[int] = 256, 
+        stride: Optional[tuple[int]] = (4, 4), 
+        tol: Optional[float] = 0., 
+        plane: Optional[str] = 'axial'):
+    """
+    Compute the likelihood ratio score (Havtorn et. al, 2021) of a three dimensional image
+    tensor/ndarray. Meant to be used with volumetric medical images like MRIs or CT scans
+
+    Params:
+        img: the input image, meant to be three dimensional
+
+        iw_samples_elbo: the number of importance weighted samples (Burda et al., 2016)
+                         for computing the ELBO
+
+        iw_samples_elbo: the number of IW-samples for computing the modified objective from
+                         Havtorn.
+
+        n_latents_skip: number of latent variables to skip (starting from the 
+                        lowest stochastic layers). The k in L_{k>}.
+
+        batch_size: batch size for evaluation
+
+        stride: the size of the strided patches computed over a slice of the image
+        
+        tol: the proportion of allowed background voxels in each patch.
+
+        plane: one of: {"axial", "sagittal", "coronal"}. The anatomical plane we
+               are taking slices from
+
+    """
     device = torch.device('cuda')
     criterion = oodd.losses.ELBO()
 
@@ -211,6 +244,10 @@ def compute_llr_scores(img, model, iw_samples_elbo=5, iw_samples_Lk=1, n_latents
 
 
 def predict_folder_pixel_abs(input_folder, target_folder):
+    """
+    Pixel level predictions for images in a folder. target_folder will be written
+    to with nifti files with "probabilities" at each voxel.
+    """
     sample_img = os.path.join(input_folder, os.listdir(input_folder)[0])
 
     sample_img_shape = nib.load(sample_img).shape
@@ -239,9 +276,6 @@ def predict_folder_pixel_abs(input_folder, target_folder):
 
         # Thresholds for normalizing scores to [0, 1]
         thresholds = {'axial': [6000, 7850], 'sagittal': [6000, 7950], 'coronal': [6000, 7750]}
-
-        #mn = 7000
-        #mx = 7900
         
     else:
         stride = (4, 4)
@@ -264,8 +298,6 @@ def predict_folder_pixel_abs(input_folder, target_folder):
 
         # Thresholds for normalizing scores to [0, 1]
         thresholds = {'axial': [6000, 7850], 'sagittal': [6000, 7950], 'coronal': [6000, 7750]}
-        #mn = 6000
-        #mx = 7900
 
     for f in os.listdir(input_folder):
         source_file = os.path.join(input_folder, f)
@@ -308,6 +340,9 @@ def predict_folder_pixel_abs(input_folder, target_folder):
         nib.save(final_nimg, target_file)
 
 def predict_folder_sample_abs(input_folder, target_folder):
+    """
+    Sample level predictions for a folder of images.
+    """
     sample_img = os.path.join(input_folder, os.listdir(input_folder)[0])
     sample_img_shape = nib.load(sample_img).shape
 
