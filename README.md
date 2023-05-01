@@ -16,4 +16,3 @@ HVAE model class and related layers & utilities (credit to Havtorn). The
 on folders of 3D images. You can write predictions out to a folder using any of
 the top-level `.sh` scripts and following the same structure to adapt them to an
 arbitrary dataset.
-```
