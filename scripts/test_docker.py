@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
     gpu_str = ""
     if no_gpu:
-        gpu_str = "--gpus device=1 "
+        gpu_str = "--gpus device=0 "
 
     print("\nPredicting brain data...")
 

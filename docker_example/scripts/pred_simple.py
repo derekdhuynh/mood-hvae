@@ -19,7 +19,7 @@ import oodd.datasets
 import oodd.utils
 
 def image_generator(img_paths, tol=0):
-    """Loads numpy arrays of images from disk"""
+    """Loads numpy nibabel arrays of images from disk"""
     for path in img_paths:
         img = nib.load(path)
         img_data = img.get_fdata()
