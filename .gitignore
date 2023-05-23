@@ -105,3 +105,6 @@ ENV/
 
 # nohup files
 nohup.out
+
+# Don't upload models folder too big
+models/
