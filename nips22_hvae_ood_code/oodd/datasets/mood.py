@@ -40,9 +40,9 @@ class MOODPatches(data.Dataset):
         elif anom:
             split = 'X_toy'
 
-        dset = load_dataset_from_file(self.dataset_path)
         print(self.dataset_path)
         print(split)
+        dset = load_dataset_from_file(self.dataset_path)
         self.examples = dset[split]
 
         if toy or anom:

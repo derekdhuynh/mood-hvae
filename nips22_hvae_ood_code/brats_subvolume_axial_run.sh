@@ -1,8 +1,8 @@
 #!/bin/sh
 
 CUDA_VISIBLE_DEVICES=0 python dvae_run.py \
---epochs 10000 \
---batch_size 16 \
+--epochs 5000 \
+--batch_size 32 \
 --free_nats 0 \
 --free_nats_epochs 0 \
 --warmup_epochs 0 \
@@ -12,12 +12,12 @@ CUDA_VISIBLE_DEVICES=0 python dvae_run.py \
 --test_importance_weighted \
 --train_datasets \
 '{
-"BratsSubvolumeLinearNormalization": {"split": "train", "dset_path": "/home/derek/mood_patches/brats_patches/brats_train_half_subvolume_reg_norm.npz"}
+"BratsSubvolumeLinearNormalization": {"split": "train", "dset_path": "/home/derek/mood_patches/brats_patches/brats_train_half_subvolume_no_scale.npz"}
 }' \
 --val_datasets \
 '{
-    "BratsSubvolumeLinearNormalization": {"split": "validation", "dset_path": "/home/derek/mood_patches/brats_patches/brats_train_half_subvolume_reg_norm.npz", "toy": false, "anom": false},
-    "BratsSubvolumeLinearNormalization": {"split": "validation", "dset_path": "/home/derek/mood_patches/brats_patches/brats_anom_half_subvolume_reg_norm.npz", "toy": false, "anom": true}
+    "BratsSubvolumeLinearNormalization": {"split": "validation", "dset_path": "/home/derek/mood_patches/brats_patches/brats_train_half_subvolume_no_scale.npz", "toy": false, "anom": false},
+    "BratsSubvolumeLinearNormalization": {"split": "validation", "dset_path": "/home/derek/mood_patches/brats_patches/brats_anom_half_subvolume_no_scale.npz", "toy": false, "anom": true}
 }' \
 --model VAE \
 --likelihood GrayscaleContinuousLogisticMixLikelihoodConv2d \

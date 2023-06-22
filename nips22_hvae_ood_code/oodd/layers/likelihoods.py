@@ -1091,10 +1091,12 @@ def grayscale_continuous_mix_logistic_rsample(l, out_channels, nr_mix):
     # select logistic parameters
     means = torch.sum(l[:, :, :, :, :nr_mix] * sel, dim=4)
     log_scales = torch.clamp(torch.sum(l[:, :, :, :, nr_mix : 2 * nr_mix] * sel, dim=4), min=-7.0)
+
     # sample from logistic & clip to interval
     # we don't actually round to the nearest 8bit value when sampling
     u = torch.empty_like(means).uniform_(1e-5, 1.0 - 1e-5)
-    x = torch.clamp(torch.clamp(means + torch.exp(log_scales) * (torch.log(u) - torch.log(1.0 - u)), min=0.), max=1.)
+    # x = torch.clamp(torch.clamp(means + torch.exp(log_scales) * (torch.log(u) - torch.log(1.0 - u)), min=0.), max=1.)
+    x = torch.clamp(means + torch.exp(log_scales) * (torch.log(u) - torch.log(1.0 - u)), min=0.)
     out = x.view(xs[:-1] + [out_channels])
 
     # put back in Pytorch ordering
